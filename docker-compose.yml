@@ -23,6 +23,12 @@ services:
     ports:
       - "6379:6379"
 
+  rabbitmq:
+    image: "rabbitmq:3.11-management"
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+
 volumes:
   mongodb:
     driver: local
