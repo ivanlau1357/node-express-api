@@ -49,6 +49,7 @@ class App {
   }
 
   async startServer() {
+    // command: bash -c "chmod +x ./wait-for-it.sh && ./wait-for-it.sh rabbitmq:5672 -- nodemon app.js"
     await this.loadRoutingConfigs()
     await this.connectMongoDB();
 
