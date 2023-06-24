@@ -5,6 +5,7 @@ const path = require('path');
 const logger = require('./loggerConfig/logger')
 const { routes } = require('./routeConfig/routes')
 const mongoose = require('mongoose');
+const MQService = require('./MqService/messageQueue')
 require('dotenv').config()
 
 
@@ -48,10 +49,24 @@ class App {
     }
   }
 
+  async connectMQ() {
+    try {
+			const messageQueue = new MQService('amqp://rabbitmq:5672');
+			await messageQueue.connect();
+			await messageQueue.assertQueue(process.env.APP_ROLE);
+			global.MessageQueue = messageQueue;
+			await messageQueue.dequeue();
+			console.log('done queue Configs');
+		} catch(e) {
+			throw new Error(`Incorrect rabbitmq config, with error ${e}`)
+		}
+  }
+
   async startServer() {
     // command: bash -c "chmod +x ./wait-for-it.sh && ./wait-for-it.sh rabbitmq:5672 -- nodemon app.js"
     await this.loadRoutingConfigs()
     await this.connectMongoDB();
+    await this.connectMQ();
 
     this.app.listen(5000, () => {
       // eslint-disable-next-line no-console
